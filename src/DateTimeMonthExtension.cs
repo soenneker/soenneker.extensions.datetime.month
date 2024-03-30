@@ -1,5 +1,5 @@
 using System.Diagnostics.Contracts;
-using Soenneker.Enums.DateTimePrecision;
+using Soenneker.Enums.UnitOfTime;
 
 namespace Soenneker.Extensions.DateTime.Month;
 
@@ -19,7 +19,7 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToStartOfMonth(this System.DateTime dateTime)
     {
-        System.DateTime result = dateTime.Trim(DateTimePrecision.Month);
+        System.DateTime result = dateTime.Trim(UnitOfTime.Month);
         return result;
     }
 
@@ -36,7 +36,7 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToEndOfMonth(this System.DateTime dateTime)
     {
-        System.DateTime result = dateTime.TrimEnd(DateTimePrecision.Month);
+        System.DateTime result = dateTime.TrimEnd(UnitOfTime.Month);
         return result;
     }
 
