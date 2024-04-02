@@ -156,7 +156,7 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToEndOfPreviousTzMonth(this System.DateTime utcNow, System.TimeZoneInfo tzInfo)
     {
-        System.DateTime result = utcNow.ToEndOfTzMonth(tzInfo).AddMonths(-1);
+        System.DateTime result = utcNow.ToTz(tzInfo).ToEndOfPreviousMonth().ToUtc(tzInfo);
         return result;
     }
 
@@ -173,7 +173,7 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToStartOfPreviousTzMonth(this System.DateTime utcNow, System.TimeZoneInfo tzInfo)
     {
-        System.DateTime result = utcNow.ToStartOfTzMonth(tzInfo).AddMonths(-1);
+        System.DateTime result = utcNow.ToTz(tzInfo).ToStartOfPreviousMonth().ToUtc(tzInfo);
         return result;
     }
 
@@ -189,7 +189,7 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToStartOfNextTzMonth(this System.DateTime utcNow, System.TimeZoneInfo tzInfo)
     {
-        System.DateTime result = utcNow.ToStartOfTzMonth(tzInfo).AddMonths(1);
+        System.DateTime result = utcNow.ToTz(tzInfo).ToStartOfNextMonth().ToUtc(tzInfo);
         return result;
     }
 
@@ -206,7 +206,9 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToEndOfNextTzMonth(this System.DateTime utcNow, System.TimeZoneInfo tzInfo)
     {
-        System.DateTime result = utcNow.ToEndOfTzMonth(tzInfo).AddMonths(1);
+        System.DateTime result = utcNow.ToTz(tzInfo).ToEndOfNextMonth().ToUtc(tzInfo);
         return result;
     }
+
+
 }
