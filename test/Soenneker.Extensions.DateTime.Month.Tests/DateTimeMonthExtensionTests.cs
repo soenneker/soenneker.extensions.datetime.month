@@ -2,7 +2,6 @@ using AwesomeAssertions;
 using Soenneker.Tests.Unit;
 using System;
 using Soenneker.Utils.TimeZones;
-using Xunit;
 
 namespace Soenneker.Extensions.DateTime.Month.Tests;
 
@@ -15,7 +14,7 @@ public class DateTimeMonthExtensionTests : UnitTest
         _utcNow = System.DateTime.UtcNow;
     }
 
-    [Fact]
+    [Test]
     public void ToStartOfMonth_should_return_expected()
     {
         System.DateTime result = _utcNow.ToStartOfMonth();
@@ -23,7 +22,7 @@ public class DateTimeMonthExtensionTests : UnitTest
         result.Hour.Should().Be(0);
     }
 
-    [Fact]
+    [Test]
     public void ToStartOfNextMonth_should_return_expected()
     {
         System.DateTime result = _utcNow.ToStartOfNextMonth();
@@ -31,14 +30,14 @@ public class DateTimeMonthExtensionTests : UnitTest
         result.Hour.Should().Be(0);
     }
 
-    [Fact]
+    [Test]
     public void ToStartOfMonth_kind_should_be_utc()
     {
         System.DateTime result = _utcNow.ToStartOfMonth();
         result.Kind.Should().Be(DateTimeKind.Utc);
     }
 
-    [Fact]
+    [Test]
     public void ToEndOfCurrentTzMonth_should_return_expected()
     {
         System.DateTime result = _utcNow.ToEndOfTzMonth(Tz.Eastern);
@@ -49,7 +48,7 @@ public class DateTimeMonthExtensionTests : UnitTest
         converted.Second.Should().Be(59);
     }
 
-    [Fact]
+    [Test]
     public void ToEndOfPreviousTzMonth_should_return_expected()
     {
         System.DateTime result = _utcNow.ToEndOfPreviousTzMonth(Tz.Eastern);
@@ -120,7 +119,7 @@ public class DateTimeMonthExtensionTests : UnitTest
         result.Should().Be(System.DateTime.Parse(expectedDate));
     }
 
-    [Fact]
+    [Test]
     public void ToEndOfMonth_Should_HandleLeapYearFebruary()
     {
         // Arrange
@@ -134,7 +133,7 @@ public class DateTimeMonthExtensionTests : UnitTest
         result.Should().BeCloseTo(expected, precision: TimeSpan.FromMilliseconds(1));
     }
 
-    [Fact]
+    [Test]
     public void ToStartOfNextMonth_Should_HandleDecemberToJanuaryTransition()
     {
         // Arrange
@@ -148,7 +147,7 @@ public class DateTimeMonthExtensionTests : UnitTest
         result.Should().Be(expected);
     }
 
-    [Fact]
+    [Test]
     public void ToStartOfPreviousMonth_Should_HandleJanuaryToDecemberTransition()
     {
         // Arrange
@@ -162,7 +161,7 @@ public class DateTimeMonthExtensionTests : UnitTest
         result.Should().Be(expected);
     }
 
-    [Fact]
+    [Test]
     public void ToStartOfTzMonth_Should_HandleDstSpringForward()
     {
         // Arrange
@@ -177,7 +176,7 @@ public class DateTimeMonthExtensionTests : UnitTest
         result.Should().Be(expected);
     }
 
-    [Fact]
+    [Test]
     public void ToEndOfTzMonth_Should_HandleDstFallBack()
     {
         // Arrange
@@ -192,7 +191,7 @@ public class DateTimeMonthExtensionTests : UnitTest
         result.Should().BeCloseTo(expected, precision: TimeSpan.FromMilliseconds(1));
     }
 
-    [Fact]
+    [Test]
     public void ToStartOfNextTzMonth_Should_HandleDstSpringForward()
     {
         // Arrange
@@ -207,7 +206,7 @@ public class DateTimeMonthExtensionTests : UnitTest
         result.Should().Be(expected);
     }
 
-    [Fact]
+    [Test]
     public void ToStartOfPreviousTzMonth_Should_HandleDstSpringForward()
     {
         // Arrange
