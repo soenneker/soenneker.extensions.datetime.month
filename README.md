@@ -5,7 +5,7 @@
 
 # ![](https://user-images.githubusercontent.com/4441470/224455560-91ed3ee7-f510-4041-a8d2-3fc093025112.png) Soenneker.Extensions.DateTime.Month
 
-A collection of helpful DateTime month-based extension methods.
+Computes current, previous, and next calendar-month boundaries for `DateTime`, with optional time-zone-aware UTC results.
 
 ## Installation
 
@@ -13,26 +13,46 @@ A collection of helpful DateTime month-based extension methods.
 dotnet add package Soenneker.Extensions.DateTime.Month
 ```
 
-## Quick start
+## Calendar-field boundaries
 
 ```csharp
 using Soenneker.Extensions.DateTime.Month;
 
-DateTime dateTime = DateTime.UtcNow;
-var result = dateTime.ToStartOfMonth();
+System.DateTime value = new(2026, 8, 29, 16, 42, 30, DateTimeKind.Utc);
+
+System.DateTime start = value.ToStartOfMonth();
+System.DateTime end = value.ToEndOfMonth();
+System.DateTime previousStart = value.ToStartOfPreviousMonth();
+System.DateTime nextEnd = value.ToEndOfNextMonth();
 ```
 
-## Common operations
+| Method | Result |
+| --- | --- |
+| `ToStartOfMonth()` | First tick of the current month |
+| `ToEndOfMonth()` | Last tick before the next month |
+| `ToStartOfPreviousMonth()` | First tick of the previous month |
+| `ToEndOfPreviousMonth()` | Last tick before the current month |
+| `ToStartOfNextMonth()` | First tick of the next month |
+| `ToEndOfNextMonth()` | Last tick before the month after next |
 
-- `ToStartOfMonth()` - Adjusts the specified DateTime to the start of its current month. Returns a new DateTime instance set to the first day of the month of the original DateTime, at 00:00 hours. Timezone information of the input DateTime is not modified or considered in the adjustment.
-- `ToEndOfMonth()` - Converts the specified date and time to the end of its month. Returns a `System.DateTime` object representing the last moment of the specified month.
-- `ToStartOfNextMonth()` - Adjusts the specified DateTime to the start of the next month. Returns a new DateTime instance set to the first day of the following month of the original DateTime, at 00:00 hours. Timezone information of the input DateTime is not modified or considered in the adjustment.
-- `ToStartOfPreviousMonth()` - Converts the specified date and time to the start of the previous month. Returns a `System.DateTime` object representing the first moment of the previous month.
-- `ToEndOfPreviousMonth()` - Converts the specified date and time to the end of the previous month. Returns a `System.DateTime` object representing the last moment of the previous month.
-- `ToEndOfNextMonth()` - Converts the specified date and time to the end of the next month. Returns a `System.DateTime` object representing the last moment of the next month.
-- `ToStartOfTzMonth()` - Converts the specified UTC DateTime to a specific timezone, then adjusts it to the start of the current month in that timezone, and converts it back to UTC. Returns a new DateTime instance in UTC, representing the start of the current month in the specified timezone.
-- `ToEndOfTzMonth()` - Adjusts the specified UTC DateTime to the very last moment of the current month according to a specific timezone, and then converts it back to UTC. Returns a new DateTime instance in UTC, representing the last moment of the current month in the specified timezone.
-- `ToEndOfPreviousTzMonth()` - Adjusts the specified UTC DateTime to the very last moment of the previous month according to a specific timezone, and then converts it back to UTC. Returns a new DateTime instance in UTC, representing the last moment of the previous month in the specified timezone.
-- `ToStartOfPreviousTzMonth()` - Converts the specified UTC date and time to the start of the previous month according to the specified time zone. Returns a `System.DateTime` object representing the first moment of the previous month in the specified time zone.
-- `ToStartOfNextTzMonth()` - Converts the specified UTC DateTime to a specific timezone, then adjusts it to the start of the next month in that timezone, and converts it back to UTC. Returns a new DateTime instance in UTC, representing the start of the next month in the specified timezone. This method is designed to handle time zone conversions explicitly.
-- `ToEndOfNextTzMonth()` - Converts the specified UTC date and time to the end of the next month according to the specified time zone. Returns a `System.DateTime` object representing the last moment of the next month in the specified time zone. This method first calculates the end of the current month for the given UTC date and time in the specified time zone, then advances to the last moment of the next month.
+These methods operate on the existing calendar fields, handle varying month lengths and leap years through `DateTime` calendar arithmetic, and preserve the input `Kind`. They do not perform time-zone conversion.
+
+## Time-zone-aware boundaries
+
+```csharp
+TimeZoneInfo eastern = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+System.DateTime utc = new(2026, 8, 29, 18, 0, 0, DateTimeKind.Utc);
+
+System.DateTime localMonthStartUtc = utc.ToStartOfTzMonth(eastern);
+System.DateTime localMonthEndUtc = utc.ToEndOfTzMonth(eastern);
+```
+
+The time-zone variants select the current, previous, or next month from the input instant's local calendar and return its boundary as a UTC `DateTime`:
+
+- `ToStartOfTzMonth()` / `ToEndOfTzMonth()`
+- `ToStartOfPreviousTzMonth()` / `ToEndOfPreviousTzMonth()`
+- `ToStartOfNextTzMonth()` / `ToEndOfNextTzMonth()`
+
+If the input `Kind` is not `Utc`, its fields are treated as UTC rather than converted from the machine's local zone. Supply an actual UTC value to avoid ambiguity.
+
+Month ends are defined as one tick before the following valid local month boundary. If a local month begins in a daylight-saving gap, the boundary advances to the first valid local minute; if it is ambiguous, the earlier UTC instant is selected.

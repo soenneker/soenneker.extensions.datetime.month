@@ -124,8 +124,7 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToStartOfTzMonth(this System.DateTime utcNow, System.TimeZoneInfo tzInfo)
     {
-        System.DateTime result = utcNow.ToTz(tzInfo).ToStartOfMonth().ToUtc(tzInfo);
-        return result;
+        return GetStartOfTzMonth(utcNow, tzInfo, 0);
     }
 
     /// <summary>
@@ -140,8 +139,7 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToEndOfTzMonth(this System.DateTime utcNow, System.TimeZoneInfo tzInfo)
     {
-        System.DateTime result = utcNow.ToTz(tzInfo).ToEndOfMonth().ToUtc(tzInfo);
-        return result;
+        return GetStartOfTzMonth(utcNow, tzInfo, 1).AddTicks(-1);
     }
 
     /// <summary>
@@ -156,8 +154,7 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToEndOfPreviousTzMonth(this System.DateTime utcNow, System.TimeZoneInfo tzInfo)
     {
-        System.DateTime result = utcNow.ToTz(tzInfo).ToEndOfPreviousMonth().ToUtc(tzInfo);
-        return result;
+        return GetStartOfTzMonth(utcNow, tzInfo, 0).AddTicks(-1);
     }
 
     /// <summary>
@@ -173,8 +170,7 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToStartOfPreviousTzMonth(this System.DateTime utcNow, System.TimeZoneInfo tzInfo)
     {
-        System.DateTime result = utcNow.ToTz(tzInfo).ToStartOfPreviousMonth().ToUtc(tzInfo);
-        return result;
+        return GetStartOfTzMonth(utcNow, tzInfo, -1);
     }
 
     /// <summary>
@@ -189,8 +185,7 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToStartOfNextTzMonth(this System.DateTime utcNow, System.TimeZoneInfo tzInfo)
     {
-        System.DateTime result = utcNow.ToTz(tzInfo).ToStartOfNextMonth().ToUtc(tzInfo);
-        return result;
+        return GetStartOfTzMonth(utcNow, tzInfo, 1);
     }
 
     /// <summary>
@@ -206,9 +201,28 @@ public static class DateTimeMonthExtension
     [Pure]
     public static System.DateTime ToEndOfNextTzMonth(this System.DateTime utcNow, System.TimeZoneInfo tzInfo)
     {
-        System.DateTime result = utcNow.ToTz(tzInfo).ToEndOfNextMonth().ToUtc(tzInfo);
-        return result;
+        return GetStartOfTzMonth(utcNow, tzInfo, 2).AddTicks(-1);
     }
 
+    private static System.DateTime GetStartOfTzMonth(System.DateTime utc, System.TimeZoneInfo timeZoneInfo, int monthOffset)
+    {
+        System.DateTime utcInstant = utc.Kind == System.DateTimeKind.Utc
+            ? utc
+            : System.DateTime.SpecifyKind(utc, System.DateTimeKind.Utc);
+        System.DateTime local = System.TimeZoneInfo.ConvertTimeFromUtc(utcInstant, timeZoneInfo);
+        var boundary = new System.DateTime(local.Year, local.Month, 1, 0, 0, 0, System.DateTimeKind.Unspecified).AddMonths(monthOffset);
+
+        while (timeZoneInfo.IsInvalidTime(boundary))
+            boundary = boundary.AddMinutes(1);
+
+        if (timeZoneInfo.IsAmbiguousTime(boundary))
+        {
+            System.TimeSpan[] offsets = timeZoneInfo.GetAmbiguousTimeOffsets(boundary);
+            System.TimeSpan chosenOffset = offsets[0] >= offsets[1] ? offsets[0] : offsets[1];
+            return System.DateTime.SpecifyKind(boundary - chosenOffset, System.DateTimeKind.Utc);
+        }
+
+        return System.TimeZoneInfo.ConvertTimeToUtc(boundary, timeZoneInfo);
+    }
 
 }
